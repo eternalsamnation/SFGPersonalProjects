@@ -1,0 +1,14 @@
+pandas
+datetime
+pillow_heif
+spotipy
+yt_dlp
+moviepy
+streamlit
+requests
+numpy
+pandas
+seaborn
+matplotlib
+scikit-learn
+statsmodels
