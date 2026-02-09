@@ -10,7 +10,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 
 from mutagen.easyid3 import EasyID3
-from config import *
+from utils.config import *
 
 OUTPUT_PATH = 'C:/Users/sfind/Music/iTunes/iTunes Media/Spotify_Downloads'
 
@@ -49,8 +49,8 @@ def fetch_link(search_query):
     finally:
         driver.quit()
 
-def song_downloader():
-    df = pd.read_csv('./SpotifyData/spotify_artists.csv')
+def ytdlp_song_downloader():
+    df = pd.read_csv('./modules/song_hub/SpotifyData/spotify_artists.csv')
 
     for _, row in df.iterrows():
         song_title = row['Name']

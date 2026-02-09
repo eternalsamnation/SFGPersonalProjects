@@ -4,7 +4,7 @@ import zipfile
 import pillow_heif
 from PIL import Image
 from pillow_heif import register_heif_opener
-from config import IMAGE_FOLDER_OUTPUT_PATH as FOLDER_OUTPUT_PATH
+from utils.config import IMAGE_FOLDER_OUTPUT_PATH as FOLDER_OUTPUT_PATH
 
 def convert_images(file_path):
     pillow_heif.register_heif_opener()
