@@ -27,7 +27,6 @@ logging.basicConfig(
 DOWNLOAD_LINK = "https://cnvmp3.com/v51"
 DOWNLOAD_DIR = 'C:/Users/sfind/Music/iTunes/iTunes Media/Spotify_Downloads'
 SONG_DF = pd.read_csv('./modules/song_hub/SpotifyData/spotify_artists.csv')
-SKIP_COUNT = 360
 
 firefox_options = FirefoxOptions()
 firefox_options.add_argument("--headless")
@@ -111,6 +110,7 @@ def tag_mp3(file_path, title, artist):
 def selenium_song_downloader(wait_between: int = 5):
     for _, row in SONG_DF.iterrows():
         try:
+            # Set Up Download Link
             song_title = row['Name']
             song_title_search = re.sub(r'[^a-zA-Z0-9]', '', song_title)
             artist_name = row['Artist(s)']
@@ -124,6 +124,7 @@ def selenium_song_downloader(wait_between: int = 5):
 
             yt_download_link = fetch_link(search_query)
 
+            # Set Up Selenium
             driver = webdriver.Chrome(
                 service=Service(ChromeDriverManager().install()),
                 options=chrome_options
@@ -161,6 +162,51 @@ def selenium_song_downloader(wait_between: int = 5):
         except Exception as e:
             print(f"Error processing {song_title} by {artist_name} with link {yt_download_link}: {e}")
             logging.warning(f"Error processing {song_title} by {artist_name} with link {yt_download_link}\n")
+            continue
+
+        finally:
+            driver.quit()
+
+def selenium_song_downloader_jr(wait_between: int = 5):
+    extra_links = [
+        'https://www.youtube.com/watch?v=R5HSXZdcUJ0&list=RDR5HSXZdcUJ0', # Paris
+        'https://www.youtube.com/watch?v=v0JzrFTvhgs&list=RDv0JzrFTvhgs', # Heartbeat Gambino
+        'https://www.youtube.com/watch?v=COz9lDCFHjw&list=RDCOz9lDCFHjw', # Passionfruit Drake
+        'https://www.youtube.com/watch?v=QKYkZnxZ3ZA&list=RDQKYkZnxZ3ZA', # Hold On We're Going Home Drake
+        'https://www.youtube.com/watch?v=qblMC5qD3tQ&list=RDqblMC5qD3tQ', # Nina Cried Power
+        'https://www.youtube.com/watch?v=OAxR_2uFO5I&list=RDOAxR_2uFO5I', # Lord Huron Harvest Moon
+        'https://www.youtube.com/watch?v=6id53KyAycI&list=RD6id53KyAycI', # The Plural of Moose is Moose
+        'https://www.youtube.com/watch?v=l3qi3E40aWE&list=RDl3qi3E40aWE', # For Once In My Live Stevie
+    ]
+
+    for yt_download_link in extra_links:
+        try:
+            driver = webdriver.Chrome(
+                service=Service(ChromeDriverManager().install()),
+                options=chrome_options
+            )
+            wait = WebDriverWait(driver, 30)
+            driver.get(DOWNLOAD_LINK)
+
+            # Wait for input box
+            input_box = wait.until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, "input[type='text']"))
+            )
+
+            input_box.clear()
+            input_box.send_keys(yt_download_link)
+            time.sleep(2)
+            input_box.send_keys(Keys.ENTER)
+
+            download_button = wait.until(EC.presence_of_element_located((
+                By.XPATH,"//main//label//input[contains(@value, 'Download') or contains(., 'Download') or @type='button' or @type='submit']"
+            )))
+            wait.until(EC.element_to_be_clickable(download_button))
+            driver.execute_script("arguments[0].click();", download_button)
+            time.sleep(wait_between)
+
+        except Exception as e:
+            print(f"Error processing link {yt_download_link}: {e}")
             continue
 
         finally:
